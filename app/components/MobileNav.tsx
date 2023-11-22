@@ -58,14 +58,16 @@ export function MobileNav({ open, onClose, menuItems }: Props) {
           ) : null}
 
           {loggedIn ? (
-            <SignOutButton>
-              <ListItem>
+            
+              <SignOutButton>
+                <ListItem>
                 <ListItemPrefix>
-                  <PowerIcon className="h-5 w-5" />
+                <PowerIcon className="h-5 w-5" />
                 </ListItemPrefix>
-                Sign Out
-              </ListItem>
-            </SignOutButton>
+                   Sign Out
+                </ListItem>
+              </SignOutButton>
+            
           ) : (
             <div className="flex items-center">
               <Link

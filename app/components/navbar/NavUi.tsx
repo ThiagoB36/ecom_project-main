@@ -1,12 +1,7 @@
 "use client";
 
 import useAuth from "@/app/hooks/useAuth";
-import {
-  Bars3Icon,
-  ShoppingBagIcon,
-  UserCircleIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { Bars3Icon, ShoppingBagIcon, UserCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import {
   IconButton,
   Navbar as MaterialNav,

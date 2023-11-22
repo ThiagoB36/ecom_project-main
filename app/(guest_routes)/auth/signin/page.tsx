@@ -8,7 +8,7 @@ import Link from "next/link";
 import * as yup from "yup";
 import { FcGoogle } from "react-icons/fc";
 import { signIn } from "next-auth/react";
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify';
 import { useRouter } from "next/navigation";
 import AuthFormContainer from "@/app/components/AuthFormContainer";
 import { filterFormikErrors } from "@/app/utils/formikHelpers";
@@ -22,12 +22,7 @@ const validationSchema = yup.object().shape({
 });
 
 export default function SignIn() {
-  //---------------- fix Bug
-  const [sttTeste, setTeste] = React.useState("");
-  const [sttValues, setValues] = React.useState({});
-  console.log({ sttTeste });
-  //---------------- fix Bug
-  const router = useRouter();
+  const router = useRouter()
   const {
     values,
     isSubmitting,
@@ -40,51 +35,19 @@ export default function SignIn() {
     initialValues: { email: "", password: "" },
     validationSchema,
     onSubmit: async (values, actions) => {
-      const signInRes = await signIn("credentials", {
-        ...values,
-        redirect: false,
-      });
-      //---------------- fix Bug
-      setValues(values);
-      teste(values);
-      //---------------- fix Bug
+       const signInRes = await signIn("credentials", {
+            ...values,
+            redirect: false,
+        });       
 
-      if (signInRes?.error) {
-        toast.error("Email/Password mismatch!");
-      }
-      if (!signInRes?.error) {
-        router.refresh();
-      }
+        if (signInRes?.error === "CredentialsSignin")  {
+          toast.error("Email/Password mismatch!")
+
+        } if (!signInRes?.error){
+          router.refresh()
+        }
     },
   });
-
-  //---------------- fix Bug
-
-  async function teste(values: any) {
-    const response = await fetch("/api/teste", {
-      method: "POST",
-      body: JSON.stringify(values),
-    });
-
-    const newCall = await response.json();
-    console.log({ newCall });
-    setTeste(newCall);
-  }
-
-  if (sttTeste !== "") {
-    if (!sttTeste.emailVerified) {
-      setTimeout(() => {
-        console.log("falso setTime", sttTeste);
-        teste(sttValues);
-      }, 1000);
-    } else {
-      setTimeout(() => {
-        console.log("verdadeiro setTime", sttTeste);
-        // handleSubmit();
-      }, 1000);
-    }
-  }
-  //---------------- fix Bug
 
   const errorsToRender = filterFormikErrors(errors, touched, values);
 
@@ -97,32 +60,24 @@ export default function SignIn() {
 
   return (
     <AuthFormContainer title="Login" onSubmit={handleSubmit}>
-      <Input
-        name="email"
-        label="Email"
-        value={email}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        error={error("email")}
-        crossOrigin={undefined}
-      />
-      <Input
-        name="password"
-        label="Password"
-        value={password}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        error={error("password")}
-        type="password"
-        crossOrigin={undefined}
-      />
 
-      <Button
-        type="submit"
-        className="w-full"
-        color="blue"
-        disabled={isSubmitting}
-      >
+      <Input
+              name="email"
+              label="Email"
+              value={email}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={error("email")} crossOrigin={undefined}      />
+      <Input
+              name="password"
+              label="Password"
+              value={password}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={error("password")}
+              type="password" crossOrigin={undefined}      />
+
+      <Button type="submit" className="w-full" color="blue" disabled={isSubmitting}>
         Sign in
       </Button>
 
@@ -147,7 +102,8 @@ export default function SignIn() {
             </div>
           );
         })}
-      </div>
+      </div>          
+
     </AuthFormContainer>
   );
 }

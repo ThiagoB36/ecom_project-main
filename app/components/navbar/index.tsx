@@ -1,6 +1,8 @@
-import React from "react";
-import NavUI from "./NavUi";
+import React from 'react'
+import NavUI from './NavUi'
 
 export default function Navbar() {
-  return <NavUI cartItemsCount={0} />;
+  return (
+  <NavUI cartItemsCount={0} />
+  )
 }
