@@ -24,11 +24,12 @@ datasource db {
   activateTokens ActivateToken[]
   activateResetTokens ActivateResetToken[]
 
-  products Product[]  //isso está correto?
-
   role UserRole @default(USER)
 
   accounts Account[]   
+
+  bulletPoints BulletPoints[]   // teste
+  products Product[]            // teste
 }
 
 enum UserRole {
@@ -79,43 +80,90 @@ model ActivateResetToken {
 
 }
 
-////////////////////////////////////////////////////////////////
+//---------------------
 
 model Product {
-  id           String       @id @default(auto()) @map("_id") @db.ObjectId
-  title        String
-  description  String
-  bulletPoints BulletPoint[]
-  thumbnails   Thumbnail[]  // Renamed to plural for better representation of multiple thumbnails
-  prices       Price[]      // Renamed to plural for better representation of multiple prices
-  sale         Float
-  quantity     Int
-  category     String
-  user         User?        @relation(fields: [userId], references: [id])
-  userId       String?      @db.ObjectId
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  title         String    // teste
+  description   String    // teste
+  bulletPoints  BulletPoints[]  
+  thumbnail     String    // teste
+  images        String    // teste
+  category      String    // teste
+  mrp           Int       // teste
+  quantity      Int       // teste
+  salePrice     Int       // teste
+
+  user User @relation(fields: [userId], references: [id])
+  userId String @db.ObjectId
 }
 
-model Thumbnail {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  url       String
-  productId String    @db.ObjectId
-  product   Product   @relation(fields: [productId], references: [id])
+model BulletPoints{
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  content       String
+
+  user User @relation(fields: [userId], references: [id])
+  userId String @db.ObjectId
+
+  product Product @relation(fields: [productId], references: [id])
+  productId String @db.ObjectId
+
 }
 
-model BulletPoint {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  content   String
-  productId String    @db.ObjectId
-  product   Product   @relation(fields: [productId], references: [id])
-}
 
-model Price {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  base      Float
-  discount  Float
-  productId String    @db.ObjectId
-  product   Product   @relation(fields: [productId], references: [id])
-}
+//title: string;
+//description: string;
+//bulletPoints?: string[];
+//thumbnail: {url: string, id:string};
+//images?: {url: string, id:string}[]; 
+//price:{
+ // base: number;
+  //discount: number;
+//}
+//sale: number;
+//quantity: number
+//category: string;
+
+//---------------------
+
+
+////////////////////////////////////////////////////////////////
+
+// model Product {
+//   id           String       @id @default(auto()) @map("_id") @db.ObjectId
+//   title        String
+//   description  String
+//   bulletPoints BulletPoint[]
+//   thumbnails   Thumbnail[]  // Renamed to plural for better representation of multiple thumbnails
+//   prices       Price[]      // Renamed to plural for better representation of multiple prices
+//   sale         Float
+//   quantity     Int
+//   category     String
+//   user         User?        @relation(fields: [userId], references: [id])
+//   userId       String?      @db.ObjectId
+// }
+
+// model Thumbnail {
+//   id        String    @id @default(auto()) @map("_id") @db.ObjectId
+//   url       String
+//   productId String    @db.ObjectId
+//   product   Product   @relation(fields: [productId], references: [id])
+// }
+
+// model BulletPoint {
+//   id        String    @id @default(auto()) @map("_id") @db.ObjectId
+//   content   String
+//   productId String    @db.ObjectId
+//   product   Product   @relation(fields: [productId], references: [id])
+// }
+
+// model Price {
+//   id        String    @id @default(auto()) @map("_id") @db.ObjectId
+//   base      Float
+//   discount  Float
+//   productId String    @db.ObjectId
+//   product   Product   @relation(fields: [productId], references: [id])
+// }
 
 //title: string;
 //description: string;

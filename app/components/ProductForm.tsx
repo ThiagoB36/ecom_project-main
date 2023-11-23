@@ -15,6 +15,7 @@ import React, {
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import categories from "@/app/utils/categories";
 import ImageSelector from "./ImageSelector";
+import { useSession } from "next-auth/react";
 
 interface Props {
   initialValue?: InitialValue;
@@ -53,6 +54,26 @@ export default function ProductForm(props: Props) {
   const [productInfo, setProductInfo] = useState({ ...defaultValue });
   const [thumbnailSource, setThumbnailSource] = useState<string[]>();
   const [productImagesSource, setProductImagesSource] = useState<string[]>();
+
+  //-------------------
+  const session = useSession();
+  const user = session.data?.user;
+
+  async function getProds() {
+    const response = await fetch("/api/products/get", {
+      method: "POST",
+    });
+    const getAll = await response.json();
+    console.log({ getAll });
+  }
+  async function delProds() {
+    const response = await fetch("/api/products/delete", {
+      method: "POST",
+    });
+    const deleteProd = await response.json();
+    console.log({ deleteProd });
+  }
+  //-------------------
 
   const fields = productInfo.bulletPoints;
 
@@ -128,8 +149,8 @@ export default function ProductForm(props: Props) {
 
       <form
         action={() =>
-          startTransition(async () => {
-            await onSubmit({ ...productInfo, images, thumbnail });
+          startTransition(() => {
+            onSubmit({ ...productInfo, images, thumbnail, user });
           })
         }
         className="space-y-6"
@@ -153,9 +174,13 @@ export default function ProductForm(props: Props) {
         </div>
 
         <Input
-                  label="Title"
-                  value={productInfo.title}
-                  onChange={({ target }) => setProductInfo({ ...productInfo, title: target.value })} crossOrigin={undefined}        />
+          label="Title"
+          value={productInfo.title}
+          onChange={({ target }) =>
+            setProductInfo({ ...productInfo, title: target.value })
+          }
+          crossOrigin={undefined}
+        />
 
         <Textarea
           className="h-52"
@@ -185,35 +210,41 @@ export default function ProductForm(props: Props) {
             <h3>Price</h3>
 
             <Input
-                          value={productInfo.mrp}
-                          label="MRP"
-                          onChange={({ target }) => {
-                              const mrp = +target.value;
-                              setProductInfo({ ...productInfo, mrp });
-                          } }
-                          className="mb-4" crossOrigin={undefined}            />
+              value={productInfo.mrp}
+              label="MRP"
+              onChange={({ target }) => {
+                const mrp = +target.value;
+                setProductInfo({ ...productInfo, mrp });
+              }}
+              className="mb-4"
+              crossOrigin={undefined}
+            />
             <Input
-                          value={productInfo.salePrice}
-                          label="Sale Price"
-                          onChange={({ target }) => {
-                              const salePrice = +target.value;
-                              setProductInfo({ ...productInfo, salePrice });
-                          } }
-                          className="mb-4" crossOrigin={undefined}            />
+              value={productInfo.salePrice}
+              label="Sale Price"
+              onChange={({ target }) => {
+                const salePrice = +target.value;
+                setProductInfo({ ...productInfo, salePrice });
+              }}
+              className="mb-4"
+              crossOrigin={undefined}
+            />
           </div>
 
           <div className="space-y-4 flex-1">
             <h3>Stock</h3>
 
             <Input
-                          value={productInfo.quantity}
-                          label="Qty"
-                          onChange={({ target }) => {
-                              const quantity = +target.value;
-                              if (!isNaN(quantity))
-                                  setProductInfo({ ...productInfo, quantity });
-                          } }
-                          className="mb-4" crossOrigin={undefined}            />
+              value={productInfo.quantity}
+              label="Qty"
+              onChange={({ target }) => {
+                const quantity = +target.value;
+                if (!isNaN(quantity))
+                  setProductInfo({ ...productInfo, quantity });
+              }}
+              className="mb-4"
+              crossOrigin={undefined}
+            />
           </div>
         </div>
 
@@ -222,11 +253,15 @@ export default function ProductForm(props: Props) {
           {fields.map((field, index) => (
             <div key={index} className="flex items-center">
               <Input
-                      type="text"
-                      value={field}
-                      label={`Bullet point ${index + 1}`}
-                      onChange={({ target }) => updateBulletPointValue(target.value, index)}
-                      className="mb-4" crossOrigin={undefined}              />
+                type="text"
+                value={field}
+                label={`Bullet point ${index + 1}`}
+                onChange={({ target }) =>
+                  updateBulletPointValue(target.value, index)
+                }
+                className="mb-4"
+                crossOrigin={undefined}
+              />
               {fields.length > 1 ? (
                 <button
                   onClick={() => removeBulletPoint(index)}
@@ -253,6 +288,15 @@ export default function ProductForm(props: Props) {
         <Button disabled={isPending} type="submit" color="blue">
           {getBtnTitle()}
         </Button>
+
+        {/*  */}
+        <Button onClick={getProds} color="blue" style={{ marginLeft: 15 }}>
+          Get Products
+        </Button>
+        <Button onClick={delProds} color="blue" style={{ marginLeft: 15 }}>
+          Delete
+        </Button>
+        {/*  */}
       </form>
     </div>
   );
