@@ -15,15 +15,16 @@ import React, {
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import categories from "@/app/utils/categories";
 import ImageSelector from "./ImageSelector";
+import { NewProductInfo } from "../types";
 import { useSession } from "next-auth/react";
 
 interface Props {
   initialValue?: InitialValue;
-  onSubmit(values: any): void;
+  onSubmit(values: NewProductInfo): void;
 }
 
 export interface InitialValue {
-  id: string;
+  userId: string;
   title: string;
   description: string;
   thumbnail: string;
@@ -55,26 +56,13 @@ export default function ProductForm(props: Props) {
   const [thumbnailSource, setThumbnailSource] = useState<string[]>();
   const [productImagesSource, setProductImagesSource] = useState<string[]>();
 
-  //-------------------
+  //-----
   const session = useSession();
+
   const user = session.data?.user;
 
-  async function getProds() {
-    const response = await fetch("/api/products/get", {
-      method: "POST",
-    });
-    const getAll = await response.json();
-    console.log({ getAll });
-  }
-  async function delProds() {
-    const response = await fetch("/api/products/delete", {
-      method: "POST",
-    });
-    const deleteProd = await response.json();
-    console.log({ deleteProd });
-  }
-  //-------------------
-
+  console.log({ session, user });
+  //-----
   const fields = productInfo.bulletPoints;
 
   const addMoreBulletPoints = () => {
@@ -149,8 +137,14 @@ export default function ProductForm(props: Props) {
 
       <form
         action={() =>
-          startTransition(() => {
-            onSubmit({ ...productInfo, images, thumbnail, user });
+          startTransition(async () => {
+            await onSubmit({
+              ...productInfo,
+              images,
+              thumbnail,
+              userId: user?.id,
+              // userId: "" // isso está certo?
+            });
           })
         }
         className="space-y-6"
@@ -288,15 +282,6 @@ export default function ProductForm(props: Props) {
         <Button disabled={isPending} type="submit" color="blue">
           {getBtnTitle()}
         </Button>
-
-        {/*  */}
-        <Button onClick={getProds} color="blue" style={{ marginLeft: 15 }}>
-          Get Products
-        </Button>
-        <Button onClick={delProds} color="blue" style={{ marginLeft: 15 }}>
-          Delete
-        </Button>
-        {/*  */}
       </form>
     </div>
   );
