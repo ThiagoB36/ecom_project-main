@@ -36,45 +36,124 @@ export const getCloudSigature = async () => {
 
 // create product
 
-export const createProduct = async (info: Product) => {
-  try {
-    await startDb();
+// {
+//   info: {
+//     title: 'ttt',
+//     description: 'dddddd',
+//     bulletPoints: [ 'bbbb01', 'bbbb02' ],
+//     mrp: 12,
+//     salePrice: 10,
+//     category: 'Automotive',
+//     quantity: 15,
+//     images: [ [Object], [Object] ],
+//     thumbnail: {
+//       url: 'https://res.cloudinary.com/dhwobxowt/image/upload/v1701343626/q35wievcfcdi59aoplnf.jpg',
+//       id: 'q35wievcfcdi59aoplnf'
+//     },
+//     userId: '655b96241d65c47ec7be860d'
+//   }
+// }
 
-    // Prepare bullet points data
-    const bulletPointsData = info.bulletPoints?.map((content) => ({
-      content,
-    }));
+export const createProduct = async (info: any) => {
+  console.log({ info });
+  const userId = info.userId;
 
-    // Create thumbnails data
-    const thumbnailData = info.thumbnail ? [{ url: info.thumbnail }] : [];
+  const defaultValues = {
+    title: info.title,
+    description: info.description,
+    mrp: info.mrp,
+    salePrice: info.salePrice,
+    category: info.category,
+    quantity: info.quantity,
+  };
 
-    // Create images data
-    const imagesData = info.images?.map((image) => ({ url: image }));
+  const product = await prisma.product.create({
+    data: {
+      ...defaultValues,
+      user: { connect: { id: userId } },
+    },
+  });
 
-    await prisma.product.create({
+  const productId = product.id;
+
+  function bulletPointsCreate() {
+    info.bulletPoints.map((item: string) => {
+      createBullet(item);
+    });
+  }
+  bulletPointsCreate();
+
+  async function createBullet(str: string) {
+    await prisma.bulletPoint.create({
       data: {
-        title: info.title,
-        description: info.description,
-        bulletPoints: {
-          create: bulletPointsData,
-        },
-        thumbnails: {
-          create: thumbnailData as any[],
-        },
-        images: {
-          create: imagesData as any[],
-        },
-        mrp: info.mrp,
-        salePrice: info.salePrice,
-        quantity: info.quantity,
-        category: info.category,
-        user: {
-          connect: { id: info.userId },
-        },
+        content: str,
+        product: { connect: { id: productId } },
       },
     });
-  } catch (error) {
-    console.log((error as any).message);
-    throw new Error("Something went wrong, can not create product!");
   }
+
+  const createImg = async (obj: any) => {
+    await prisma.image.create({
+      data: {
+        url: obj.url,
+        product: { connect: { id: productId } },
+      },
+    });
+  };
+
+  const imgCreate = () => {
+    info.images.map((item: any) => {
+      createImg(item);
+    });
+  };
+  imgCreate();
+
+  await prisma.thumbnail.create({
+    data: {
+      url: info.thumbnail.url,
+      product: { connect: { id: productId } },
+    },
+  });
+
+  // export const createProduct = async (info: Product) => {
+  //   try {
+  //     await startDb();
+
+  //     // Prepare bullet points data
+  //     const bulletPointsData = info.bulletPoints?.map((content) => ({
+  //       content,
+  //     }));
+
+  //     // Create thumbnails data
+  //     const thumbnailData = info.thumbnail ? [{ url: info.thumbnail }] : [];
+
+  //     // Create images data
+  //     const imagesData = info.images?.map((image) => ({ url: image }));
+
+  //     await prisma.product.create({
+  //       data: {
+  //         title: info.title,
+  //         description: info.description,
+  //         bulletPoints: {
+  //           create: bulletPointsData,
+  //         },
+  //         thumbnails: {
+  //           create: thumbnailData as any[],
+  //         },
+  //         images: {
+  //           create: imagesData as any[],
+  //         },
+  //         mrp: info.mrp,
+  //         salePrice: info.salePrice,
+  //         quantity: info.quantity,
+  //         category: info.category,
+  //         user: {
+  //           connect: { id: info.userId },
+  //         },
+  //       },
+  //     });
+  //   } catch (error) {
+  //     console.log((error as any).message);
+  //     throw new Error("Something went wrong, can not create product!");
+  //   }
 };

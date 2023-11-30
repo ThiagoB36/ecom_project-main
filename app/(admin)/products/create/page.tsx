@@ -41,15 +41,17 @@ import { createProduct, getCloudConfig, getCloudSigature } from "../action";
 //   return Promise.all(uploadPromise);
 // }
 
-async function uploadProductImages(images: any) {
-  const arrImg = images.map(async (item: any) => {
-    const createImg = await uploadImage(item);
-    console.log({ createImg });
+function uploadProductImages(images: any) {
+  let arrPromises: any = [];
+  images.map((item: any) => {
+    const createImg = uploadImage(item);
+    arrPromises.push(createImg);
   });
+  const arrProdsImg = Promise.all(arrPromises);
+  return arrProdsImg;
 }
 
 const uploadImage = async (image: File) => {
-  console.log({ image });
   const { timestamp, signature } = await getCloudSigature();
   const cloudConfig = await getCloudConfig();
 
@@ -67,7 +69,6 @@ const uploadImage = async (image: File) => {
   });
 
   const data = await res.json();
-  console.log({ data });
 
   return { url: data.secure_url, id: data.public_id };
 };
@@ -75,15 +76,19 @@ const uploadImage = async (image: File) => {
 export default function Create() {
   const handleCreateProduct = async (values: any) => {
     const { thumbnail, images } = values;
+    let objProduct = { ...values };
 
     const thumbnailRes = await uploadImage(thumbnail);
+    objProduct.thumbnail = thumbnailRes;
 
     let productImages: { url: string; id: string }[] = [];
 
     if (images && images.length > 0) {
-      let teste = await uploadProductImages(images);
-      console.log({ teste });
+      let resImgPromises = await uploadProductImages(images);
+      objProduct.images = resImgPromises;
     }
+
+    createProduct(objProduct);
   };
   // const handleCreateProduct = async (values: NewProductInfo) => {
   //   const { thumbnail, images } = values;
@@ -121,11 +126,6 @@ export default function Create() {
   return (
     <div>
       <ProductForm onSubmit={handleCreateProduct} />
-      {/* <ProductForm
-        onSubmit={(form) => {
-          console.log({ form });
-        }}
-      /> */}
     </div>
   );
 }
