@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 
 export const POST = async (req: Request) => {
   const body = await req.json();
-  console.log({ body });
   const userId = body.user.id;
 
   const defaultValue = {

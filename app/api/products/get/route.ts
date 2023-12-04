@@ -9,6 +9,5 @@ export const POST = async () => {
       products: true,
     },
   });
-  console.log({ allUser });
   return NextResponse.json(allUser);
 };

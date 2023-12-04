@@ -88,9 +88,8 @@ model Product {
   bulletPoints BulletPoint[] @relation("BulletPointsToProduct")
   thumbnails   Thumbnail[] @relation("ThumbnailToProduct") // Renamed to plural for better representation of multiple thumbnails
   images       Image[] @relation("ImagesToProduct")
-  mrp          Float
-  //prices       Float     // Renamed to plural for better representation of multiple prices
-  salePrice    Float
+  price        Json
+  sale         Float
   quantity     Int
   category     String
   

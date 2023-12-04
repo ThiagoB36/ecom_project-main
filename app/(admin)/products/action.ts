@@ -1,7 +1,7 @@
 "use server";
 
 import { startDb } from "@/app/lib/db";
-import { NewProductInfo, Product } from "@/app/types";
+import { NewProductInfo, Product, image, info } from "@/app/types";
 import prisma from "@/prisma";
 import { v2 as cloudinary } from "cloudinary";
 
@@ -54,15 +54,22 @@ export const getCloudSigature = async () => {
 //   }
 // }
 
-export const createProduct = async (info: any) => {
+export const createProduct = async (info: info) => {
+  console.log("create");
   console.log({ info });
   const userId = info.userId;
+
+  const sale = (info.mrp - info.salePrice) / info.mrp;
+  console.log({ sale });
 
   const defaultValues = {
     title: info.title,
     description: info.description,
-    mrp: info.mrp,
-    salePrice: info.salePrice,
+    price: {
+      base: info.mrp,
+      discounted: info.salePrice,
+    },
+    sale,
     category: info.category,
     quantity: info.quantity,
   };
@@ -92,7 +99,7 @@ export const createProduct = async (info: any) => {
     });
   }
 
-  const createImg = async (obj: any) => {
+  const createImg = async (obj: image) => {
     await prisma.image.create({
       data: {
         url: obj.url,
@@ -102,7 +109,7 @@ export const createProduct = async (info: any) => {
   };
 
   const imgCreate = () => {
-    info.images.map((item: any) => {
+    info.images.map((item: image) => {
       createImg(item);
     });
   };

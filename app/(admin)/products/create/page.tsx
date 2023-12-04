@@ -74,6 +74,7 @@ const uploadImage = async (image: File) => {
 };
 
 export default function Create() {
+  console.log("handle");
   const handleCreateProduct = async (values: any) => {
     const { thumbnail, images } = values;
     let objProduct = { ...values };

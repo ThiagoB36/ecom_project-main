@@ -61,7 +61,6 @@ export default function ProductForm(props: Props) {
 
   const user = session.data?.user;
 
-  console.log({ session, user });
   //-----
   const fields = productInfo.bulletPoints;
 
@@ -202,17 +201,19 @@ export default function ProductForm(props: Props) {
         <div className="flex space-x-4">
           <div className="space-y-4 flex-1">
             <h3>Price</h3>
-
+            {/* //------- MRP prox aula*/}
             <Input
               value={productInfo.mrp}
               label="MRP"
               onChange={({ target }) => {
                 const mrp = +target.value;
+                console.log({ mrp, target });
                 setProductInfo({ ...productInfo, mrp });
               }}
               className="mb-4"
               crossOrigin={undefined}
             />
+            {/* //------- MRP prox aula */}
             <Input
               value={productInfo.salePrice}
               label="Sale Price"
