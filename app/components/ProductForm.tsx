@@ -17,6 +17,7 @@ import categories from "@/app/utils/categories";
 import ImageSelector from "./ImageSelector";
 import { NewProductInfo } from "../types";
 import { useSession } from "next-auth/react";
+import { showReaisMask } from "../utils/helpers/masks";
 
 interface Props {
   initialValue?: InitialValue;
@@ -60,6 +61,30 @@ export default function ProductForm(props: Props) {
   const session = useSession();
 
   const user = session.data?.user;
+  const [sttValue, setValue] = useState("");
+
+  // const showReaisMask = (info: string) => {
+  //   const dataInfo = info ?? "";
+  //   let chars = String(dataInfo) ?? "";
+
+  //   const onlyNumbers: any = chars.replace(/\D/g, "");
+  //   console.log({ onlyNumbers });
+  //   const stringWithMask = (onlyNumbers / 100)
+  //     .toFixed(2)
+  //     .replace(".", ",")
+  //     .replace(/\d(?=(\d{3})+,)/g, "$&.");
+
+  //   const mrpDot = stringWithMask.replace(".", "");
+  //   const mrpRep = mrpDot.replace(",", ".");
+  //   const mrp = Number(mrpRep);
+
+  //   const cond = productInfo.mrp !== mrp;
+  //   if (cond) setProductInfo({ ...productInfo, mrp });
+  //   console.log({ cond, productInfo });
+
+  //   console.log({ stringWithMask });
+  //   return { mask: stringWithMask };
+  // };
 
   //-----
   const fields = productInfo.bulletPoints;
@@ -203,12 +228,13 @@ export default function ProductForm(props: Props) {
             <h3>Price</h3>
             {/* //------- MRP prox aula*/}
             <Input
-              value={productInfo.mrp}
+              // value={productInfo.mrp}
+              value={showReaisMask(sttValue, productInfo, setProductInfo).mask}
               label="MRP"
               onChange={({ target }) => {
-                const mrp = +target.value;
-                console.log({ mrp, target });
-                setProductInfo({ ...productInfo, mrp });
+                const txt = target.value;
+                setValue(txt);
+                // setProductInfo({ ...productInfo, mrp });
               }}
               className="mb-4"
               crossOrigin={undefined}
