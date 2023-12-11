@@ -1,49 +1,14 @@
 "use client";
 
 import ProductForm from "@/app/components/ProductForm";
-import { NewProductInfo, Product } from "@/app/types";
-import { newProductInfoSchema } from "@/app/utils/validationProductSchema";
+import { NewProductInfo, image } from "@/app/types";
 import React from "react";
-import { ValidationError } from "yup";
-import { toast } from "react-toastify";
-// import { uploadImage } from "@/app/utils/helper";
 import { createProduct, getCloudConfig, getCloudSigature } from "../action";
 
-/* export default function Create() {
-  const handleCreateProduct = async (values: NewProductInfo) => {
-    const {thumbnail, images} = values
-    try {
-     await newProductInfoSchema.validate(values, { abortEarly: false});
-     const thumbnailRes = uploadImage(thumbnail!);
-     
-     let productImages : {url: string, id:string}[] = []
-     if(images){
-       const uploadPromise = images.map(async (imageFile) => {
-       const {url, id} = await uploadImage(imageFile)
-       return {url, id}
-      })      
-      productImages = await Promise.all(uploadPromise)
-     }
+function uploadProductImages(images: File[]) {
+  let arrPromises: Promise<image>[] = [];
 
-     createProduct({
-      ...values,   
-      thumbnail: thumbnailRes,
-      images: productImages,
-     }) */
-
-// async function uploadProductImages(
-//   images: File[]
-// ): Promise<{ url: string; id: string }[]> {
-//   const uploadPromise = images.map(async (imageFile) => {
-//     const { url, id } = await uploadImage(imageFile);
-//     return { url, id };
-//   });
-//   return Promise.all(uploadPromise);
-// }
-
-function uploadProductImages(images: any) {
-  let arrPromises: any = [];
-  images.map((item: any) => {
+  images.map((item: File) => {
     const createImg = uploadImage(item);
     arrPromises.push(createImg);
   });
@@ -74,55 +39,48 @@ const uploadImage = async (image: File) => {
 };
 
 export default function Create() {
-  console.log("handle");
-  const handleCreateProduct = async (values: any) => {
-    const { thumbnail, images } = values;
-    let objProduct = { ...values };
+  let thumbnailObj: image;
+  let imagesObj: image[];
 
-    const thumbnailRes = await uploadImage(thumbnail);
-    objProduct.thumbnail = thumbnailRes;
+  const handleCreateProduct = async (values: NewProductInfo) => {
+    const {
+      thumbnail,
+      images,
+      userId,
+      bulletPoints,
+      category,
+      description,
+      mrp,
+      quantity,
+      salePrice,
+      title,
+    } = values;
 
-    let productImages: { url: string; id: string }[] = [];
+    if (thumbnail) {
+      const thumbnailRes = await uploadImage(thumbnail);
+      thumbnailObj = thumbnailRes;
+    }
 
     if (images && images.length > 0) {
       let resImgPromises = await uploadProductImages(images);
-      objProduct.images = resImgPromises;
+      imagesObj = resImgPromises;
     }
 
-    createProduct(objProduct);
+    const newObj = {
+      userId,
+      bulletPoints,
+      category,
+      description,
+      mrp,
+      quantity,
+      salePrice,
+      title,
+      thumbnail: thumbnailObj,
+      images: imagesObj,
+    };
+
+    createProduct(newObj);
   };
-  // const handleCreateProduct = async (values: NewProductInfo) => {
-  //   const { thumbnail, images } = values;
-
-  //   try {
-  //     await newProductInfoSchema.validate(values, { abortEarly: false });
-
-  //     if (!thumbnail) {
-  //       throw new Error("Thumbnail is required."); // Assuming thumbnail is mandatory
-  //     }
-
-  //     const thumbnailRes = await uploadImage(thumbnail);
-
-  //     let productImages: { url: string; id: string }[] = [];
-  //     if (images && images.length > 0) {
-  //       productImages = await uploadProductImages(images);
-  //     }
-
-  //     const product: Product = {
-  //       ...values,
-  //       thumbnail: thumbnailRes,
-  //       images: productImages,
-  //     };
-
-  //     createProduct(product);
-  //   } catch (error) {
-  //     if (error instanceof ValidationError) {
-  //       error.inner.map((err) => {
-  //         toast.error(err.message);
-  //       });
-  //     }
-  //   }
-  // };
 
   return (
     <div>

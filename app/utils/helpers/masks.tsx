@@ -11,25 +11,21 @@ interface Prods {
 export const showReaisMask = (
   info: string,
   productInfo: Prods,
-  setProductInfo: (i: Prods) => void
+  setProductInfo: (i: Prods) => void,
+  field: "mrp" | "salePrice"
 ) => {
-  const dataInfo = info ?? "";
-  let chars = String(dataInfo) ?? "";
-
-  const onlyNumbers: any = chars.replace(/\D/g, "");
+  const onlyNumbers: any = info.replace(/\D/g, "");
   const stringWithMask = (onlyNumbers / 100)
     .toFixed(2)
     .replace(".", ",")
     .replace(/\d(?=(\d{3})+,)/g, "$&.");
 
-  const mrpDot = stringWithMask.replace(".", "");
-  const mrpRep = mrpDot.replace(",", ".");
-  const mrp = Number(mrpRep);
+  const dot = stringWithMask.replace(".", "");
+  const rep = dot.replace(",", ".");
+  const num = Number(rep);
 
-  //------------------
-  const cond = productInfo.mrp !== mrp;
-  if (cond) setProductInfo({ ...productInfo, mrp });
+  const cond = productInfo[`${field}`] !== num;
+  if (cond) setProductInfo({ ...productInfo, [`${field}`]: num });
 
   return { mask: stringWithMask };
-  //------------------
 };

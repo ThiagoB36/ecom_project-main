@@ -57,36 +57,14 @@ export default function ProductForm(props: Props) {
   const [thumbnailSource, setThumbnailSource] = useState<string[]>();
   const [productImagesSource, setProductImagesSource] = useState<string[]>();
 
-  //-----
   const session = useSession();
 
   const user = session.data?.user;
-  const [sttValue, setValue] = useState("");
+  const [sttValue, setValue] = useState({
+    mrp: "",
+    salePrice: "",
+  });
 
-  // const showReaisMask = (info: string) => {
-  //   const dataInfo = info ?? "";
-  //   let chars = String(dataInfo) ?? "";
-
-  //   const onlyNumbers: any = chars.replace(/\D/g, "");
-  //   console.log({ onlyNumbers });
-  //   const stringWithMask = (onlyNumbers / 100)
-  //     .toFixed(2)
-  //     .replace(".", ",")
-  //     .replace(/\d(?=(\d{3})+,)/g, "$&.");
-
-  //   const mrpDot = stringWithMask.replace(".", "");
-  //   const mrpRep = mrpDot.replace(",", ".");
-  //   const mrp = Number(mrpRep);
-
-  //   const cond = productInfo.mrp !== mrp;
-  //   if (cond) setProductInfo({ ...productInfo, mrp });
-  //   console.log({ cond, productInfo });
-
-  //   console.log({ stringWithMask });
-  //   return { mask: stringWithMask };
-  // };
-
-  //-----
   const fields = productInfo.bulletPoints;
 
   const addMoreBulletPoints = () => {
@@ -167,7 +145,6 @@ export default function ProductForm(props: Props) {
               images,
               thumbnail,
               userId: user?.id,
-              // userId: "" // isso está certo?
             });
           })
         }
@@ -226,26 +203,32 @@ export default function ProductForm(props: Props) {
         <div className="flex space-x-4">
           <div className="space-y-4 flex-1">
             <h3>Price</h3>
-            {/* //------- MRP prox aula*/}
             <Input
-              // value={productInfo.mrp}
-              value={showReaisMask(sttValue, productInfo, setProductInfo).mask}
+              value={
+                showReaisMask(sttValue.mrp, productInfo, setProductInfo, "mrp")
+                  .mask
+              }
               label="MRP"
               onChange={({ target }) => {
                 const txt = target.value;
-                setValue(txt);
-                // setProductInfo({ ...productInfo, mrp });
+                setValue({ ...sttValue, mrp: txt });
               }}
               className="mb-4"
               crossOrigin={undefined}
             />
-            {/* //------- MRP prox aula */}
             <Input
-              value={productInfo.salePrice}
+              value={
+                showReaisMask(
+                  sttValue.salePrice,
+                  productInfo,
+                  setProductInfo,
+                  "salePrice"
+                ).mask
+              }
               label="Sale Price"
               onChange={({ target }) => {
-                const salePrice = +target.value;
-                setProductInfo({ ...productInfo, salePrice });
+                const txt = target.value;
+                setValue({ ...sttValue, salePrice: txt });
               }}
               className="mb-4"
               crossOrigin={undefined}
