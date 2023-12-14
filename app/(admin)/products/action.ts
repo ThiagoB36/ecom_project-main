@@ -1,7 +1,7 @@
 "use server";
 
 import { startDb } from "@/app/lib/db";
-import { NewProductInfo, Product, image, info } from "@/app/types";
+import { image, info } from "@/app/types";
 import prisma from "@/prisma";
 import { v2 as cloudinary } from "cloudinary";
 
@@ -19,8 +19,6 @@ export const getCloudConfig = async () => {
   };
 };
 
-// generate cloud signature
-
 export const getCloudSigature = async () => {
   const secret = cloudinary.config().api_secret as string;
   const timestamp = Math.round(new Date().getTime() / 1000);
@@ -34,33 +32,10 @@ export const getCloudSigature = async () => {
   return { timestamp, signature };
 };
 
-// create product
-
-// {
-//   info: {
-//     title: 'ttt',
-//     description: 'dddddd',
-//     bulletPoints: [ 'bbbb01', 'bbbb02' ],
-//     mrp: 12,
-//     salePrice: 10,
-//     category: 'Automotive',
-//     quantity: 15,
-//     images: [ [Object], [Object] ],
-//     thumbnail: {
-//       url: 'https://res.cloudinary.com/dhwobxowt/image/upload/v1701343626/q35wievcfcdi59aoplnf.jpg',
-//       id: 'q35wievcfcdi59aoplnf'
-//     },
-//     userId: '655b96241d65c47ec7be860d'
-//   }
-// }
-
 export const createProduct = async (info: info) => {
-  console.log("create");
-  console.log({ info });
   const userId = info.userId;
 
   const sale = (info.mrp - info.salePrice) / info.mrp;
-  console.log({ sale });
 
   const defaultValues = {
     title: info.title,
@@ -121,46 +96,21 @@ export const createProduct = async (info: info) => {
       product: { connect: { id: productId } },
     },
   });
+};
 
-  // export const createProduct = async (info: Product) => {
-  //   try {
-  //     await startDb();
+export const fetchProducts = async (userId: string | undefined) => {
+  await startDb();
 
-  //     // Prepare bullet points data
-  //     const bulletPointsData = info.bulletPoints?.map((content) => ({
-  //       content,
-  //     }));
-
-  //     // Create thumbnails data
-  //     const thumbnailData = info.thumbnail ? [{ url: info.thumbnail }] : [];
-
-  //     // Create images data
-  //     const imagesData = info.images?.map((image) => ({ url: image }));
-
-  //     await prisma.product.create({
-  //       data: {
-  //         title: info.title,
-  //         description: info.description,
-  //         bulletPoints: {
-  //           create: bulletPointsData,
-  //         },
-  //         thumbnails: {
-  //           create: thumbnailData as any[],
-  //         },
-  //         images: {
-  //           create: imagesData as any[],
-  //         },
-  //         mrp: info.mrp,
-  //         salePrice: info.salePrice,
-  //         quantity: info.quantity,
-  //         category: info.category,
-  //         user: {
-  //           connect: { id: info.userId },
-  //         },
-  //       },
-  //     });
-  //   } catch (error) {
-  //     console.log((error as any).message);
-  //     throw new Error("Something went wrong, can not create product!");
-  //   }
+  const allProds = await prisma.product.findMany({
+    where: { userId: userId },
+    select: {
+      thumbnails: true,
+      price: true,
+      quantity: true,
+      category: true,
+      title: true,
+      id: true,
+    },
+  });
+  return allProds;
 };

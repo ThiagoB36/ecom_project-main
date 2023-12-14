@@ -13,6 +13,10 @@ import truncate from "truncate";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import SearchForm from "./SearchForm";
+import { JsonValue } from "@prisma/client/runtime/library";
+import { useSession } from "next-auth/react";
+import { fetchProducts } from "../(admin)/products/action";
+import { useState } from "react";
 
 export interface Product {
   id: string;
@@ -29,9 +33,9 @@ export interface Product {
 }
 
 const formatPrice = (amount: number) => {
-  const formatter = new Intl.NumberFormat("en-US", {
+  const formatter = new Intl.NumberFormat("pt-BR", {
     style: "currency",
-    currency: "INR",
+    currency: "BRL",
   });
 
   return formatter.format(amount);
@@ -47,20 +51,40 @@ const TABLE_HEAD = [
 ];
 
 interface Props {
-  products: Product[];
   currentPageNo: number;
   hasMore?: boolean;
   showPageNavigator?: boolean;
 }
 
+interface Prods {
+  category: string;
+  price: any; //----- fix this
+  quantity: number;
+  thumbnails: {
+    id: string;
+    productId: string;
+    url: string;
+  }[];
+  title: string;
+  id: string;
+}
+
 export default function ProductTable(props: Props) {
   const router = useRouter();
-  const {
-    products = [],
-    currentPageNo,
-    hasMore,
-    showPageNavigator = true,
-  } = props;
+  const { currentPageNo, hasMore, showPageNavigator = true } = props;
+  const [sttProds, setProds] = useState<Prods[]>([]);
+  const [sttProdsFirstTime, setProdsFirstTime] = useState<boolean>(true);
+
+  async function getProds() {
+    const session = useSession();
+    const userId = session.data?.user.id;
+    const allProds = await fetchProducts(userId);
+
+    if (allProds && sttProdsFirstTime) {
+      setProds(allProds), setProdsFirstTime(false);
+    }
+  }
+  getProds();
 
   const handleOnPrevPress = () => {
     const prevPage = currentPageNo - 1;
@@ -112,9 +136,10 @@ export default function ProductTable(props: Props) {
             </tr>
           </thead>
           <tbody>
-            {products.map((item, index) => {
-              const { id, thumbnail, title, price, quantity, category } = item;
-              const isLast = index === products.length - 1;
+            {sttProds.map((item: Prods, index: number) => {
+              const thumbnail = item.thumbnails[0].url;
+              const { id, title, price, quantity, category } = item;
+              const isLast = index === sttProds.length - 1;
               const classes = isLast
                 ? "p-4"
                 : "p-4 border-b border-blue-gray-50";
@@ -146,7 +171,7 @@ export default function ProductTable(props: Props) {
                       color="blue-gray"
                       className="font-normal"
                     >
-                      {formatPrice(price.mrp)}
+                      {formatPrice(price.base)}
                     </Typography>
                   </td>
                   <td className={classes}>
@@ -155,7 +180,7 @@ export default function ProductTable(props: Props) {
                       color="blue-gray"
                       className="font-normal"
                     >
-                      {formatPrice(price.salePrice)}
+                      {formatPrice(price.discounted)}
                     </Typography>
                   </td>
                   <td className={classes}>
