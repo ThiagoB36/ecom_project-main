@@ -102,7 +102,10 @@ export const fetchProducts = async (userId: string | undefined) => {
   await startDb();
 
   const allProds = await prisma.product.findMany({
-    where: { userId: userId },
+    where: {
+      userId: userId,
+      price: { not: null as any },
+    },
     select: {
       thumbnails: true,
       price: true,
@@ -111,6 +114,7 @@ export const fetchProducts = async (userId: string | undefined) => {
       title: true,
       id: true,
     },
+    orderBy: { createdAt: "desc" },
   });
   return allProds;
 };

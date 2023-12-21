@@ -74,6 +74,7 @@ export default function ProductTable(props: Props) {
   const { currentPageNo, hasMore, showPageNavigator = true } = props;
   const [sttProds, setProds] = useState<Prods[]>([]);
   const [sttProdsFirstTime, setProdsFirstTime] = useState<boolean>(true);
+  const [sttMinMax, setMinMax] = useState({ min: 0, max: 5 });
 
   async function getProds() {
     const session = useSession();
@@ -85,17 +86,44 @@ export default function ProductTable(props: Props) {
     }
   }
   getProds();
-
+  let arr: any = [];
+  function newArr(props: { min: number; max: number }) {
+    const { min, max } = props;
+    if (sttProds.length > 0) {
+      sttProds.map((item, idx) => {
+        if (idx >= min && idx < max) {
+          arr[idx] = item;
+        }
+        // arr.push(item); //----- deixar dinamico
+      });
+    }
+  }
+  newArr(sttMinMax);
   const handleOnPrevPress = () => {
-    const prevPage = currentPageNo - 1;
-    if (prevPage > 0) router.push(`/products?page=${prevPage}`);
+    const { min, max } = sttMinMax;
+    let newMin: number = min;
+    let newMax: number = max;
+    if (min > 0) {
+      (newMin = min - 5), (newMax = max - 5);
+    }
+    setMinMax({ min: newMin, max: newMax });
+    // const prevPage = currentPageNo - 1;
+    // if (prevPage > 0) router.push(`/products?page=${prevPage}`);
   };
 
   const handleOnNextPress = () => {
-    const nextPage = currentPageNo + 1;
-    router.push(`/products?page=${nextPage}`);
-  };
+    const { min, max } = sttMinMax;
+    let newMin: number = min;
+    let newMax: number = max;
+    const length = sttProds.length; //---11
+    if (length >= max) {
+      (newMin = min + 5), (newMax = max + 5);
+    }
 
+    setMinMax({ min: newMin, max: newMax });
+    // const nextPage = currentPageNo + 1;
+    // router.push(`/products?page=${nextPage}`);
+  };
   return (
     <div className="py-5">
       <div className="mb-4 flex flex-col justify-between gap-8 md:flex-row md:items-center">
@@ -136,7 +164,7 @@ export default function ProductTable(props: Props) {
             </tr>
           </thead>
           <tbody>
-            {sttProds.map((item: Prods, index: number) => {
+            {arr.map((item: Prods, index: number) => {
               const thumbnail = item.thumbnails[0].url;
               const { id, title, price, quantity, category } = item;
               const isLast = index === sttProds.length - 1;
@@ -214,14 +242,14 @@ export default function ProductTable(props: Props) {
         <CardFooter className="flex items-center justify-center border-t border-blue-gray-50 p-4">
           <div className="flex items-center gap-2">
             <Button
-              disabled={currentPageNo === 1}
+              disabled={currentPageNo === 1} //----- funcionar de forma dinamica
               onClick={handleOnPrevPress}
               variant="text"
             >
               Previous
             </Button>
             <Button
-              disabled={!hasMore}
+              // disabled={!hasMore} //----- funcionar de forma dinamica
               onClick={handleOnNextPress}
               variant="text"
             >
