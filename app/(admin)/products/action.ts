@@ -98,8 +98,14 @@ export const createProduct = async (info: info) => {
   });
 };
 
-export const fetchProducts = async (userId: string | undefined) => {
+export const fetchProducts = async (
+  userId: string | undefined
+  // pageNo: number,
+  // perPage: number
+) => {
   await startDb();
+
+  // const skipCount = (pageNo - 1) * perPage;
 
   const allProds = await prisma.product.findMany({
     where: {
@@ -115,6 +121,8 @@ export const fetchProducts = async (userId: string | undefined) => {
       id: true,
     },
     orderBy: { createdAt: "desc" },
+    // skip: skipCount,
+    // take: perPage,
   });
   return allProds;
 };

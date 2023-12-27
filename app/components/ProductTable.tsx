@@ -75,11 +75,13 @@ export default function ProductTable(props: Props) {
   const [sttProds, setProds] = useState<Prods[]>([]);
   const [sttProdsFirstTime, setProdsFirstTime] = useState<boolean>(true);
   const [sttMinMax, setMinMax] = useState({ min: 0, max: 5 });
+  // const [sttHasMore, setHasMore] = useState(true);
 
   async function getProds() {
     const session = useSession();
     const userId = session.data?.user.id;
     const allProds = await fetchProducts(userId);
+    console.log({ allProds });
 
     if (allProds && sttProdsFirstTime) {
       setProds(allProds), setProdsFirstTime(false);
@@ -124,6 +126,9 @@ export default function ProductTable(props: Props) {
     // const nextPage = currentPageNo + 1;
     // router.push(`/products?page=${nextPage}`);
   };
+  console.log({ arr });
+
+  const length = sttProds.length;
   return (
     <div className="py-5">
       <div className="mb-4 flex flex-col justify-between gap-8 md:flex-row md:items-center">
@@ -242,7 +247,8 @@ export default function ProductTable(props: Props) {
         <CardFooter className="flex items-center justify-center border-t border-blue-gray-50 p-4">
           <div className="flex items-center gap-2">
             <Button
-              disabled={currentPageNo === 1} //----- funcionar de forma dinamica
+              // disabled={currentPageNo === 1} //----- funcionar de forma dinamica
+              disabled={sttMinMax.min === 0} //----- funcionar de forma dinamica
               onClick={handleOnPrevPress}
               variant="text"
             >
@@ -250,6 +256,7 @@ export default function ProductTable(props: Props) {
             </Button>
             <Button
               // disabled={!hasMore} //----- funcionar de forma dinamica
+              disabled={sttMinMax.max > length} //----- funcionar de forma dinamica
               onClick={handleOnNextPress}
               variant="text"
             >
