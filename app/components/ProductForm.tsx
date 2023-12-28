@@ -108,6 +108,7 @@ export default function ProductForm(props: Props) {
       setIsForUpdate(true);
     }
   }, []);
+  console.log({ productInfo });
 
   const onImagesChange: ChangeEventHandler<HTMLInputElement> = ({ target }) => {
     const files = target.files;

@@ -52,8 +52,7 @@ export interface Product {
 }
 
 export interface NewProductInfo {
-  // userId: string;
-  userId: any;
+  userId: string | undefined;
   title: string;
   description: string;
   bulletPoints: string[];
@@ -81,4 +80,17 @@ export interface info {
 export interface image {
   url: string;
   id: string;
+}
+
+export interface ProductResponse {
+  userId: string;
+  title: string | undefined;
+  description: string | undefined;
+  bulletPoints?: string[];
+  mrp: number;
+  salePrice: number;
+  category: string | undefined;
+  quantity: number | undefined;
+  thumbnail?: { url: string; id: string };
+  images?: { url: string; id: string }[];
 }
