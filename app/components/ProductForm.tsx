@@ -49,6 +49,7 @@ const defaultValue = {
 
 export default function ProductForm(props: Props) {
   const { onSubmit, initialValue } = props;
+  console.log({initialValue})
   const [isPending, startTransition] = useTransition();
   const [images, setImages] = useState<File[]>([]);
   const [thumbnail, setThumbnail] = useState<File>();
@@ -65,7 +66,12 @@ export default function ProductForm(props: Props) {
     salePrice: "",
   });
 
-  const fields = productInfo.bulletPoints;
+  // const fields = productInfo.bulletPoints;
+  let fields:any = []
+ productInfo.bulletPoints.map(item=>{
+fields.push(item.content)
+})
+console.log({fields})
 
   const addMoreBulletPoints = () => {
     setProductInfo({
@@ -102,6 +108,7 @@ export default function ProductForm(props: Props) {
 
   useEffect(() => {
     if (initialValue) {
+      console.log('effect')
       setProductInfo({ ...initialValue });
       setThumbnailSource([initialValue.thumbnail]);
       setProductImagesSource(initialValue.images);

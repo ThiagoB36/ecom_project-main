@@ -81,13 +81,10 @@ export default function Create() {
 
     createProduct(newObj);
   };
-  function teste() {
-    console.log("teste");
-  }
+
   return (
     <div>
-      <ProductForm onSubmit={teste} />
-      {/* <ProductForm onSubmit={handleCreateProduct} /> */}
+      <ProductForm onSubmit={handleCreateProduct} />
     </div>
   );
 }

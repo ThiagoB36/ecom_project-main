@@ -46,7 +46,7 @@ const fetchProductInfo = async (productId: string): Promise<string> => {
     description: product?.description,
     quantity: product?.quantity,
     price: product?.price,
-    bulletpoints: product?.bulletPoints,
+    bulletPoints: product?.bulletPoints,
     images: product?.images.map(({ url, id }) => {
       return { url, id };
     }),
@@ -59,6 +59,5 @@ const fetchProductInfo = async (productId: string): Promise<string> => {
 export default async function UpdatePage(props: Props) {
   const { productId } = props.params;
   const product = await fetchProductInfo(productId);
-  console.log(product);
   return <UpdateProduct product={JSON.parse(product)} />;
 }
