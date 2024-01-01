@@ -50,7 +50,7 @@ const TABLE_HEAD = [
   "Edit",
 ];
 
-interface Props { 
+interface Props {
   currentPageNo: number;
   hasMore?: boolean;
   showPageNavigator?: boolean;
@@ -58,7 +58,7 @@ interface Props {
 
 interface Prods {
   category: string;
-  price: any,
+  price: any;
   quantity: number;
   thumbnails: {
     id: string;
@@ -71,11 +71,7 @@ interface Prods {
 
 export default function ProductTable(props: Props) {
   const router = useRouter();
-  const {    
-    currentPageNo,
-    hasMore,
-    showPageNavigator = true,
-  } = props;
+  const { currentPageNo, hasMore, showPageNavigator = true } = props;
 
   const [sttProds, setProds] = useState<Prods[]>([]);
   const [sttProdsFirstTime, setProdsFirstTime] = useState<boolean>(true);
@@ -84,7 +80,7 @@ export default function ProductTable(props: Props) {
     const session = useSession();
     const userId = session.data?.user.id;
     const allProds = await fetchProducts(userId, 1, 1);
-    console.log({allProds})
+    console.log({ allProds });
 
     if (allProds && sttProdsFirstTime) {
       setProds(allProds), setProdsFirstTime(false);

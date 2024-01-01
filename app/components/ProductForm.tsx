@@ -36,6 +36,10 @@ export interface InitialValue {
   images?: string[];
   bulletPoints: string[];
   mrp: number;
+  price: {
+    base: number;
+    discounted: number;
+  };
   salePrice: number;
   category: string;
   quantity: number;
@@ -53,6 +57,7 @@ const defaultValue = {
 
 export default function ProductForm(props: Props) {
   const { onSubmit, initialValue } = props;
+  console.log({ initialValue });
   const [isPending, startTransition] = useTransition();
   const [images, setImages] = useState<File[]>([]);
   const [thumbnail, setThumbnail] = useState<File>();
@@ -86,6 +91,10 @@ export default function ProductForm(props: Props) {
   }, []); // Ensure the effect runs only once
 
   const fields = productInfo.bulletPoints;
+  // let fields: any = [];
+  // productInfo.bulletPoints.map((item) => {
+  //   fields.push(item.content);
+  // });
 
   const addMoreBulletPoints = () => {
     setProductInfo({
@@ -122,6 +131,14 @@ export default function ProductForm(props: Props) {
 
   useEffect(() => {
     if (initialValue) {
+      const mrpRaw =
+        initialValue?.price?.base && initialValue?.price?.base * 100;
+      const salePriceRaw =
+        initialValue?.price?.discounted &&
+        initialValue?.price?.discounted * 100;
+      const mrp = String(mrpRaw) ?? "0";
+      const salePrice = String(salePriceRaw) ?? "0";
+      setValue({ salePrice, mrp });
       setProductInfo({ ...initialValue });
       setThumbnailSource([initialValue.thumbnail]);
       setProductImagesSource(initialValue.images);
@@ -254,7 +271,7 @@ export default function ProductForm(props: Props) {
 
         <div className="space-y-4">
           <h3>Bullet points</h3>
-          {fields.map((field, index) => (
+          {fields.map((field:any, index:number) => (
             <div key={index} className="flex items-center">
               <Input
                       type="text"
