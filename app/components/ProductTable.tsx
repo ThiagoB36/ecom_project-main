@@ -81,7 +81,6 @@ export default function ProductTable(props: Props) {
     const session = useSession();
     const userId = session.data?.user.id;
     const allProds = await fetchProducts(userId);
-    console.log({ allProds });
 
     if (allProds && sttProdsFirstTime) {
       setProds(allProds), setProdsFirstTime(false);
@@ -126,7 +125,6 @@ export default function ProductTable(props: Props) {
     // const nextPage = currentPageNo + 1;
     // router.push(`/products?page=${nextPage}`);
   };
-  console.log({ arr });
 
   const length = sttProds.length;
   return (

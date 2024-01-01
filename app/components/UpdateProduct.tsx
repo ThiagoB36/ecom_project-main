@@ -9,18 +9,27 @@ interface Props {
 }
 
 export default function UpdateProduct({ product }: any) {
-  console.log('prod updt', product)
-  //----------type
-  const mrp= product.price.base
-  const salePrice= product.price.discounted
 
+  let img: string[] = [];
+  let bullp: string[] = [];
+  product?.images.map((item: { url: string; id: string }) => {
+    const url = item.url;
+    img.push(url);
+  });
+
+  product.bulletPoints.map(
+    (item: { id: string; content: string; productId: string }) => {
+      console.log({ item });
+      const content = item.content;
+      bullp.push(content);
+    }
+  );
+  //----------type
   const initialValue = {
     ...product,
-    thumbnail: product.thumbnail?.url,
-    images: product.images?.map(({ url }) => url),
-mrp,
- salePrice,
-    bulletPoints: product.bulletPoints || [],
+    thumbnail: product.thumbnail[0]?.url,
+    images: img,
+    bulletPoints: bullp,
   };
   return (
     <ProductForm
