@@ -16,16 +16,20 @@ import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import categories from "@/app/utils/categories";
 import ImageSelector from "./ImageSelector";
 import { NewProductInfo } from "../types";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 import { useSession } from "next-auth/react";
-import { showReaisMask } from "../utils/helpers/masks";
+import { showReaisMask } from "../utils/helpers/mask";
+
 
 interface Props {
-  initialValue?: InitialValue;
+  initialValue?: any;
+  // initialValue?: InitialValue;
   onSubmit(values: NewProductInfo): void;
 }
 
-export interface InitialValue {
-  userId: string;
+export interface InitialValue { 
+  userId: string
   title: string;
   description: string;
   thumbnail: string;
@@ -56,14 +60,30 @@ export default function ProductForm(props: Props) {
   const [productInfo, setProductInfo] = useState({ ...defaultValue });
   const [thumbnailSource, setThumbnailSource] = useState<string[]>();
   const [productImagesSource, setProductImagesSource] = useState<string[]>();
+  
+    const session = useSession() 
 
-  const session = useSession();
+    const user = session.data?.user;
 
-  const user = session.data?.user;
   const [sttValue, setValue] = useState({
     mrp: "",
     salePrice: "",
-  });
+  }); 
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        const session = await getServerSession(authOptions);
+        console.log("session product form ====>>>>", session);
+        // Use the session data as needed
+      } catch (error) {
+        console.error("Error fetching session:", error);
+        // Handle the error appropriately
+      }
+    };
+
+    fetchSession();
+  }, []); // Ensure the effect runs only once
 
   const fields = productInfo.bulletPoints;
 
@@ -108,7 +128,7 @@ export default function ProductForm(props: Props) {
       setIsForUpdate(true);
     }
   }, []);
-  console.log({ productInfo });
+  console.log({fields, initialValue})
 
   const onImagesChange: ChangeEventHandler<HTMLInputElement> = ({ target }) => {
     const files = target.files;
@@ -142,10 +162,8 @@ export default function ProductForm(props: Props) {
         action={() =>
           startTransition(async () => {
             await onSubmit({
-              ...productInfo,
-              images,
-              thumbnail,
-              userId: user?.id,
+                ...productInfo, images, thumbnail,
+                userId: user?.id // isso está certo?
             });
           })
         }
@@ -170,13 +188,9 @@ export default function ProductForm(props: Props) {
         </div>
 
         <Input
-          label="Title"
-          value={productInfo.title}
-          onChange={({ target }) =>
-            setProductInfo({ ...productInfo, title: target.value })
-          }
-          crossOrigin={undefined}
-        />
+                  label="Title"
+                  value={productInfo.title}
+                  onChange={({ target }) => setProductInfo({ ...productInfo, title: target.value })} crossOrigin={undefined}        />
 
         <Textarea
           className="h-52"
@@ -204,52 +218,37 @@ export default function ProductForm(props: Props) {
         <div className="flex space-x-4">
           <div className="space-y-4 flex-1">
             <h3>Price</h3>
+
             <Input
-              value={
-                showReaisMask(sttValue.mrp, productInfo, setProductInfo, "mrp")
-                  .mask
-              }
-              label="MRP"
-              onChange={({ target }) => {
-                const txt = target.value;
-                setValue({ ...sttValue, mrp: txt });
-              }}
-              className="mb-4"
-              crossOrigin={undefined}
-            />
+                          value={showReaisMask(sttValue.mrp, productInfo, setProductInfo, "mrp").mask}                        
+                          label="MRP"
+                          onChange={({ target }) => {                             
+                              const txt = target.value
+                              setValue({...sttValue, mrp:txt})
+                          } }
+                          className="mb-4" crossOrigin={undefined}            />
             <Input
-              value={
-                showReaisMask(
-                  sttValue.salePrice,
-                  productInfo,
-                  setProductInfo,
-                  "salePrice"
-                ).mask
-              }
-              label="Sale Price"
-              onChange={({ target }) => {
-                const txt = target.value;
-                setValue({ ...sttValue, salePrice: txt });
-              }}
-              className="mb-4"
-              crossOrigin={undefined}
-            />
+                          value={showReaisMask(sttValue.salePrice, productInfo, setProductInfo, "salePrice").mask}                          
+                          label="Sale Price"
+                          onChange={({ target }) => {                            
+                              const txt = target.value
+                              setValue({...sttValue, salePrice:txt})
+                          } }
+                          className="mb-4" crossOrigin={undefined}            />
           </div>
 
           <div className="space-y-4 flex-1">
             <h3>Stock</h3>
 
             <Input
-              value={productInfo.quantity}
-              label="Qty"
-              onChange={({ target }) => {
-                const quantity = +target.value;
-                if (!isNaN(quantity))
-                  setProductInfo({ ...productInfo, quantity });
-              }}
-              className="mb-4"
-              crossOrigin={undefined}
-            />
+                          value={productInfo.quantity}
+                          label="Qty"
+                          onChange={({ target }) => {
+                              const quantity = +target.value;
+                              if (!isNaN(quantity))
+                                  setProductInfo({ ...productInfo, quantity });
+                          } }
+                          className="mb-4" crossOrigin={undefined}            />
           </div>
         </div>
 
@@ -258,15 +257,11 @@ export default function ProductForm(props: Props) {
           {fields.map((field, index) => (
             <div key={index} className="flex items-center">
               <Input
-                type="text"
-                value={field}
-                label={`Bullet point ${index + 1}`}
-                onChange={({ target }) =>
-                  updateBulletPointValue(target.value, index)
-                }
-                className="mb-4"
-                crossOrigin={undefined}
-              />
+                      type="text"
+                      value={field}
+                      label={`Bullet point ${index + 1}`}
+                      onChange={({ target }) => updateBulletPointValue(target.value, index)}
+                      className="mb-4" crossOrigin={undefined}              />
               {fields.length > 1 ? (
                 <button
                   onClick={() => removeBulletPoint(index)}

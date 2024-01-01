@@ -1,10 +1,12 @@
-import ProductTable from "@/app/components/ProductTable";
-import React from "react";
+import ProductTable from '@/app/components/ProductTable'
+import React from 'react'
 
-export default async function Products() {
+
+
+export default function Products() {
   return (
     <div>
-      <ProductTable currentPageNo={0} />
+        <ProductTable currentPageNo={0}  />
     </div>
-  );
+  )
 }

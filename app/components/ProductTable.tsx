@@ -1,4 +1,5 @@
 "use client";
+
 import { PencilIcon } from "@heroicons/react/24/solid";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import {
@@ -13,10 +14,9 @@ import truncate from "truncate";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import SearchForm from "./SearchForm";
-import { JsonValue } from "@prisma/client/runtime/library";
 import { useSession } from "next-auth/react";
-import { fetchProducts } from "../(admin)/products/action";
 import { useState } from "react";
+import { fetchProducts } from "../(admin)/products/action";
 
 export interface Product {
   id: string;
@@ -50,7 +50,7 @@ const TABLE_HEAD = [
   "Edit",
 ];
 
-interface Props {
+interface Props { 
   currentPageNo: number;
   hasMore?: boolean;
   showPageNavigator?: boolean;
@@ -58,7 +58,7 @@ interface Props {
 
 interface Prods {
   category: string;
-  price: any; //----- fix this
+  price: any,
   quantity: number;
   thumbnails: {
     id: string;
@@ -71,64 +71,37 @@ interface Prods {
 
 export default function ProductTable(props: Props) {
   const router = useRouter();
-  const { currentPageNo, hasMore, showPageNavigator = true } = props;
+  const {    
+    currentPageNo,
+    hasMore,
+    showPageNavigator = true,
+  } = props;
+
   const [sttProds, setProds] = useState<Prods[]>([]);
   const [sttProdsFirstTime, setProdsFirstTime] = useState<boolean>(true);
-  const [sttMinMax, setMinMax] = useState({ min: 0, max: 5 });
-  // const [sttHasMore, setHasMore] = useState(true);
 
-  async function getProds() {
+  async function getProducts() {
     const session = useSession();
     const userId = session.data?.user.id;
-    const allProds = await fetchProducts(userId);
-    console.log({ allProds });
+    const allProds = await fetchProducts(userId, 1, 1);
+    console.log({allProds})
 
     if (allProds && sttProdsFirstTime) {
       setProds(allProds), setProdsFirstTime(false);
     }
   }
-  getProds();
-  let arr: any = [];
-  function newArr(props: { min: number; max: number }) {
-    const { min, max } = props;
-    if (sttProds.length > 0) {
-      sttProds.map((item, idx) => {
-        if (idx >= min && idx < max) {
-          arr[idx] = item;
-        }
-        // arr.push(item); //----- deixar dinamico
-      });
-    }
-  }
-  newArr(sttMinMax);
+  getProducts();
+
   const handleOnPrevPress = () => {
-    const { min, max } = sttMinMax;
-    let newMin: number = min;
-    let newMax: number = max;
-    if (min > 0) {
-      (newMin = min - 5), (newMax = max - 5);
-    }
-    setMinMax({ min: newMin, max: newMax });
-    // const prevPage = currentPageNo - 1;
-    // if (prevPage > 0) router.push(`/products?page=${prevPage}`);
+    const prevPage = currentPageNo - 1;
+    if (prevPage > 0) router.push(`/products?page=${prevPage}`);
   };
 
   const handleOnNextPress = () => {
-    const { min, max } = sttMinMax;
-    let newMin: number = min;
-    let newMax: number = max;
-    const length = sttProds.length; //---11
-    if (length >= max) {
-      (newMin = min + 5), (newMax = max + 5);
-    }
-
-    setMinMax({ min: newMin, max: newMax });
-    // const nextPage = currentPageNo + 1;
-    // router.push(`/products?page=${nextPage}`);
+    const nextPage = currentPageNo + 1;
+    router.push(`/products?page=${nextPage}`);
   };
-  console.log({ arr });
 
-  const length = sttProds.length;
   return (
     <div className="py-5">
       <div className="mb-4 flex flex-col justify-between gap-8 md:flex-row md:items-center">
@@ -169,7 +142,7 @@ export default function ProductTable(props: Props) {
             </tr>
           </thead>
           <tbody>
-            {arr.map((item: Prods, index: number) => {
+            {sttProds.map((item: Prods, index: number) => {
               const thumbnail = item.thumbnails[0].url;
               const { id, title, price, quantity, category } = item;
               const isLast = index === sttProds.length - 1;
@@ -247,16 +220,14 @@ export default function ProductTable(props: Props) {
         <CardFooter className="flex items-center justify-center border-t border-blue-gray-50 p-4">
           <div className="flex items-center gap-2">
             <Button
-              // disabled={currentPageNo === 1} //----- funcionar de forma dinamica
-              disabled={sttMinMax.min === 0} //----- funcionar de forma dinamica
+              disabled={currentPageNo === 1}
               onClick={handleOnPrevPress}
               variant="text"
             >
               Previous
             </Button>
             <Button
-              // disabled={!hasMore} //----- funcionar de forma dinamica
-              disabled={sttMinMax.max > length} //----- funcionar de forma dinamica
+              disabled={!hasMore}
               onClick={handleOnNextPress}
               variant="text"
             >
