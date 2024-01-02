@@ -21,26 +21,25 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 import { useSession } from "next-auth/react";
 import { showReaisMask } from "../utils/helpers/mask";
 
-
 interface Props {
-  initialValue?: any;
-  // initialValue?: InitialValue;
+  // initialValue?: any;
+  initialValue?: InitialValue;
   onSubmit(values: NewProductInfo): void;
 }
 
-export interface InitialValue { 
-  userId: string
+export interface InitialValue {
+  userId: string;
   title: string;
   description: string;
   thumbnail: string;
   images?: string[];
   bulletPoints: string[];
   mrp: number;
-  price: {
-    base: number;
-    discounted: number;
-  };
   salePrice: number;
+  price:{
+    base:number,
+    discounted:number
+  }
   category: string;
   quantity: number;
 }
@@ -56,8 +55,8 @@ const defaultValue = {
 };
 
 export default function ProductForm(props: Props) {
+  console.log({ props });
   const { onSubmit, initialValue } = props;
-  console.log({ initialValue });
   const [isPending, startTransition] = useTransition();
   const [images, setImages] = useState<File[]>([]);
   const [thumbnail, setThumbnail] = useState<File>();
@@ -65,15 +64,16 @@ export default function ProductForm(props: Props) {
   const [productInfo, setProductInfo] = useState({ ...defaultValue });
   const [thumbnailSource, setThumbnailSource] = useState<string[]>();
   const [productImagesSource, setProductImagesSource] = useState<string[]>();
-  
-    const session = useSession() 
 
-    const user = session.data?.user;
+  console.log({ productInfo });
+  const session = useSession();
+
+  const user = session.data?.user;
 
   const [sttValue, setValue] = useState({
     mrp: "",
     salePrice: "",
-  }); 
+  });
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -91,10 +91,6 @@ export default function ProductForm(props: Props) {
   }, []); // Ensure the effect runs only once
 
   const fields = productInfo.bulletPoints;
-  // let fields: any = [];
-  // productInfo.bulletPoints.map((item) => {
-  //   fields.push(item.content);
-  // });
 
   const addMoreBulletPoints = () => {
     setProductInfo({
@@ -131,21 +127,18 @@ export default function ProductForm(props: Props) {
 
   useEffect(() => {
     if (initialValue) {
-      const mrpRaw =
-        initialValue?.price?.base && initialValue?.price?.base * 100;
-      const salePriceRaw =
-        initialValue?.price?.discounted &&
-        initialValue?.price?.discounted * 100;
-      const mrp = String(mrpRaw) ?? "0";
-      const salePrice = String(salePriceRaw) ?? "0";
-      setValue({ salePrice, mrp });
+      const mrpRaw = initialValue?.price?.base&& initialValue.price.base*100
+      const salePriceRaw =initialValue?.price?.discounted&& initialValue?.price?.discounted*100
+      const mrp = String(mrpRaw)??'0'
+      const salePrice =String(salePriceRaw)??'0'
+      setValue({ mrp, salePrice });
       setProductInfo({ ...initialValue });
       setThumbnailSource([initialValue.thumbnail]);
       setProductImagesSource(initialValue.images);
       setIsForUpdate(true);
     }
   }, []);
-  console.log({fields, initialValue})
+  console.log({ fields, initialValue });
 
   const onImagesChange: ChangeEventHandler<HTMLInputElement> = ({ target }) => {
     const files = target.files;
@@ -179,8 +172,10 @@ export default function ProductForm(props: Props) {
         action={() =>
           startTransition(async () => {
             await onSubmit({
-                ...productInfo, images, thumbnail,
-                userId: user?.id // isso está certo?
+              ...productInfo,
+              images,
+              thumbnail,
+              userId: user?.id, // isso está certo?
             });
           })
         }
@@ -205,9 +200,13 @@ export default function ProductForm(props: Props) {
         </div>
 
         <Input
-                  label="Title"
-                  value={productInfo.title}
-                  onChange={({ target }) => setProductInfo({ ...productInfo, title: target.value })} crossOrigin={undefined}        />
+          label="Title"
+          value={productInfo.title}
+          onChange={({ target }) =>
+            setProductInfo({ ...productInfo, title: target.value })
+          }
+          crossOrigin={undefined}
+        />
 
         <Textarea
           className="h-52"
@@ -237,48 +236,68 @@ export default function ProductForm(props: Props) {
             <h3>Price</h3>
 
             <Input
-                          value={showReaisMask(sttValue.mrp, productInfo, setProductInfo, "mrp").mask}                        
-                          label="MRP"
-                          onChange={({ target }) => {                             
-                              const txt = target.value
-                              setValue({...sttValue, mrp:txt})
-                          } }
-                          className="mb-4" crossOrigin={undefined}            />
+              value={
+                showReaisMask(sttValue.mrp, productInfo, setProductInfo, "mrp")
+                  .mask
+              }
+              label="MRP"
+              onChange={({ target }) => {
+                const txt = target.value;
+                setValue({ ...sttValue, mrp: txt });
+              }}
+              className="mb-4"
+              crossOrigin={undefined}
+            />
             <Input
-                          value={showReaisMask(sttValue.salePrice, productInfo, setProductInfo, "salePrice").mask}                          
-                          label="Sale Price"
-                          onChange={({ target }) => {                            
-                              const txt = target.value
-                              setValue({...sttValue, salePrice:txt})
-                          } }
-                          className="mb-4" crossOrigin={undefined}            />
+              value={
+                showReaisMask(
+                  sttValue.salePrice,
+                  productInfo,
+                  setProductInfo,
+                  "salePrice"
+                ).mask
+              }
+              label="Sale Price"
+              onChange={({ target }) => {
+                const txt = target.value;
+                setValue({ ...sttValue, salePrice: txt });
+              }}
+              className="mb-4"
+              crossOrigin={undefined}
+            />
           </div>
 
           <div className="space-y-4 flex-1">
             <h3>Stock</h3>
 
             <Input
-                          value={productInfo.quantity}
-                          label="Qty"
-                          onChange={({ target }) => {
-                              const quantity = +target.value;
-                              if (!isNaN(quantity))
-                                  setProductInfo({ ...productInfo, quantity });
-                          } }
-                          className="mb-4" crossOrigin={undefined}            />
+              value={productInfo.quantity}
+              label="Qty"
+              onChange={({ target }) => {
+                const quantity = +target.value;
+                if (!isNaN(quantity))
+                  setProductInfo({ ...productInfo, quantity });
+              }}
+              className="mb-4"
+              crossOrigin={undefined}
+            />
           </div>
         </div>
 
         <div className="space-y-4">
           <h3>Bullet points</h3>
-          {fields.map((field:any, index:number) => (
+          {fields.map((field, index) => (
             <div key={index} className="flex items-center">
               <Input
-                      type="text"
-                      value={field}
-                      label={`Bullet point ${index + 1}`}
-                      onChange={({ target }) => updateBulletPointValue(target.value, index)}
-                      className="mb-4" crossOrigin={undefined}              />
+                type="text"
+                value={field}
+                label={`Bullet point ${index + 1}`}
+                onChange={({ target }) =>
+                  updateBulletPointValue(target.value, index)
+                }
+                className="mb-4"
+                crossOrigin={undefined}
+              />
               {fields.length > 1 ? (
                 <button
                   onClick={() => removeBulletPoint(index)}

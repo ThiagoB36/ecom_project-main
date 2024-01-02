@@ -86,11 +86,15 @@ export interface ProductResponse {
   userId: string;
   title: string | undefined;
   description: string | undefined;
-  bulletPoints?: string[];
+  bulletPoints?: { id: string; content: string; productId: string }[];
   mrp: number;
   salePrice: number;
+  price:{
+    base: number;
+    discounted: number;
+  }
   category: string | undefined;
   quantity: number | undefined;
-  thumbnail?: { url: string; id: string };
+  thumbnail?: { url: string; id: string }[] | undefined;
   images?: { url: string; id: string }[];
 }
