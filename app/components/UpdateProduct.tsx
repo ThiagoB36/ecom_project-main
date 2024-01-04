@@ -9,6 +9,7 @@ interface Props {
 }
 
 export default function UpdateProduct({ product }: Props) {
+  console.log({product})
   let img: string[] = [];
   let bulletPoint: string[] = [];
   product?.images?.map((item: { url: string; id: string }) => {

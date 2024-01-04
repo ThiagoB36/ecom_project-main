@@ -1,17 +1,8 @@
 "use client";
-import {
-  Button,
-  Input,
-  Option,
-  Select,
-  Textarea,
-} from "@material-tailwind/react";
-import React, {
-  useEffect,
-  useState,
-  useTransition,
-  ChangeEventHandler,
-} from "react";
+import { Button, Input, Option } from "@material-tailwind/react";
+import { Select, Textarea } from "@material-tailwind/react";
+import React, { useEffect, useState } from "react";
+import { useTransition, ChangeEventHandler } from "react";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import categories from "@/app/utils/categories";
 import ImageSelector from "./ImageSelector";
@@ -22,7 +13,6 @@ import { useSession } from "next-auth/react";
 import { showReaisMask } from "../utils/helpers/mask";
 
 interface Props {
-  // initialValue?: any;
   initialValue?: InitialValue;
   onSubmit(values: NewProductInfo): void;
 }
@@ -36,10 +26,10 @@ export interface InitialValue {
   bulletPoints: string[];
   mrp: number;
   salePrice: number;
-  price:{
-    base:number,
-    discounted:number
-  }
+  price: {
+    base: number;
+    discounted: number;
+  };
   category: string;
   quantity: number;
 }
@@ -55,7 +45,6 @@ const defaultValue = {
 };
 
 export default function ProductForm(props: Props) {
-  console.log({ props });
   const { onSubmit, initialValue } = props;
   const [isPending, startTransition] = useTransition();
   const [images, setImages] = useState<File[]>([]);
@@ -65,7 +54,6 @@ export default function ProductForm(props: Props) {
   const [thumbnailSource, setThumbnailSource] = useState<string[]>();
   const [productImagesSource, setProductImagesSource] = useState<string[]>();
 
-  console.log({ productInfo });
   const session = useSession();
 
   const user = session.data?.user;
@@ -127,10 +115,12 @@ export default function ProductForm(props: Props) {
 
   useEffect(() => {
     if (initialValue) {
-      const mrpRaw = initialValue?.price?.base&& initialValue.price.base*100
-      const salePriceRaw =initialValue?.price?.discounted&& initialValue?.price?.discounted*100
-      const mrp = String(mrpRaw)??'0'
-      const salePrice =String(salePriceRaw)??'0'
+      const mrpRaw = initialValue?.price?.base && initialValue.price.base * 100;
+      const salePriceRaw =
+        initialValue?.price?.discounted &&
+        initialValue?.price?.discounted * 100;
+      const mrp = String(mrpRaw) ?? "0";
+      const salePrice = String(salePriceRaw) ?? "0";
       setValue({ mrp, salePrice });
       setProductInfo({ ...initialValue });
       setThumbnailSource([initialValue.thumbnail]);

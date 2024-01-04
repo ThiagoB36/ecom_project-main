@@ -83,9 +83,10 @@ export interface image {
 }
 
 export interface ProductResponse {
+  id?:string
   userId: string;
-  title: string | undefined;
-  description: string | undefined;
+  title: string;
+  description: string ;
   bulletPoints?: { id: string; content: string; productId: string }[];
   mrp: number;
   salePrice: number;
@@ -93,8 +94,8 @@ export interface ProductResponse {
     base: number;
     discounted: number;
   }
-  category: string | undefined;
-  quantity: number | undefined;
-  thumbnail?: { url: string; id: string }[] | undefined;
+  category: string ;
+  quantity: number ;
+  thumbnail?: { url: string; id: string }[] ;
   images?: { url: string; id: string }[];
 }

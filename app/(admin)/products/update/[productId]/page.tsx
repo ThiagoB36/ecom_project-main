@@ -36,22 +36,32 @@ const fetchProductInfo = async (productId: string): Promise<string> => {
       bulletPoints: true,
       thumbnails: true,
       images: true,
+      userId: true,
     },
   });
 
-  const finalProduct: any = {
+  const prod = product?.price;
+  const str = JSON.stringify(prod);
+  const obj = JSON.parse(str);
+  console.log({ product });
+
+  const finalProduct: ProductResponse = {
     //----------type
     id: product?.id.toString(),
-    title: product?.title,
-    description: product?.description,
-    quantity: product?.quantity,
-    price: product?.price,
+    title: product?.title ?? "",
+    description: product?.description ?? "",
+    quantity: product?.quantity ?? 0,
+    price: { base: obj.base, discounted: obj.discounted },
     bulletPoints: product?.bulletPoints,
     images: product?.images.map(({ url, id }) => {
       return { url, id };
     }),
     thumbnail: product?.thumbnails,
-    category: product?.category,
+    category: product?.category ?? "",
+    userId: product?.userId ?? "",
+    //-------------
+    mrp: 0,
+    salePrice: 0
   };
   return JSON.stringify(finalProduct);
 };

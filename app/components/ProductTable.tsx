@@ -80,7 +80,6 @@ export default function ProductTable(props: Props) {
     const session = useSession();
     const userId = session.data?.user.id;
     const allProds = await fetchProducts(userId, 1, 1);
-    console.log({ allProds });
 
     if (allProds && sttProdsFirstTime) {
       setProds(allProds), setProdsFirstTime(false);
